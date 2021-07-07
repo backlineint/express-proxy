@@ -1,3 +1,20 @@
+## Healthcheck Proxy POC
+
+Start server with `npm run bridge`
+
+Requests to `http://localhost:3333/healthcheck` will be handled by Express.
+
+All other requests will be routed to the JS Framework of choice (NextJS in this case.) `http://localhost:3333/` and `http://localhost:3333/api/hello` should be valid routes.
+
+Note: the `npm run bridge` script currently runs Next in dev mode for demo purposes.
+
+Open Questions / Issues:
+* How should the `npm run bridge` (or whatever we want to call it) script be injected into package.json?
+* How do we determine the correct scripts to use as part of the above command? https://github.com/netlify/build-info perhaps?
+* The final version of this shouldn't expose a port.
+
+---
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
