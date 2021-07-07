@@ -1,28 +1,35 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
-const { listFrameworks, hasFramework, getFramework } = require('@netlify/framework-info')
+const { listFrameworks } = require('@netlify/framework-info')
 
-// Create Express Server
-const app = express();
+async function launchBridge() {
+  const frameworkData = await listFrameworks();
 
-// Configuration
-const PORT = 3333;
-const HOST = "localhost";
-const FRAMEWORK_PORT = 3000;
-const API_SERVICE_URL = `http://${HOST}:${FRAMEWORK_PORT}`;
+  // Create Express Server
+  const app = express();
 
-// Health check GET endpoint
-app.get('/healthcheck', (req, res, next) => {
-  res.send('This route will handle health checks');
-});
+  // Configuration
+  const port = 3333;
+  const host = "localhost";
+  const frameworkPort = frameworkData[0].dev.port;
+  const apiServiceUrl = `http://${host}:${frameworkPort}`;
 
-// All other routes should be passed along to the client site
-app.use('/', createProxyMiddleware('**', {
-  target: API_SERVICE_URL,
-  changeOrigin: true,
-}));
+  // Health check GET endpoint
+  app.get('/healthcheck', (req, res, next) => {
+    res.send('This route will handle health checks');
+  });
 
-// Start the Proxy
-app.listen(PORT, HOST, () => {
-  console.log(`Starting Proxy at ${HOST}:${PORT}`);
-});
+  // All other routes should be passed along to the client site
+  app.use('/', createProxyMiddleware('**', {
+    target: apiServiceUrl,
+    changeOrigin: true,
+  }));
+
+  // Start the Proxy
+  app.listen(port, host, () => {
+    console.log(`Starting Proxy at ${port}:${host}`);
+  });
+
+}
+
+launchBridge();
