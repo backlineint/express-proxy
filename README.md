@@ -10,6 +10,7 @@ Note: the this POC currently runs Next in dev mode for demo purposes.
 
 Open Questions / Issues:
 * How do we determine the correct scripts to use as part of the above command? https://github.com/netlify/build-info perhaps?
+* What is the correct way to include this script in the build? Wondering if the least disruptive way would be a subdirectory that has a separate set of node dependencies. This would require adjustments to how we're identifying the framework here (might not be much of an issue if that info exists in envars.)
 
 ---
 

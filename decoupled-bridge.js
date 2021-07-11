@@ -1,5 +1,3 @@
-// TODO - Simulate running this as an external dependency. Try moving to subdirectory.
-
 const http = require('http');
 const httpProxy = require('http-proxy');
 const proxy = httpProxy.createServer();
