@@ -46,20 +46,18 @@ async function launchBridge() {
   const frameworkPort = frameworkData[0].dev.port;
   const frameworkUrl = `http://${host}:${frameworkPort}`;
 
+  console.log(`Launching ${frameworkData[0].name}`);
+  const framework = spawn('npm', ['run', 'dev']);
+  addListeners(framework);
+
   // Proxy all traffic to desired port
   http.createServer((req, res) => {
     let target = frameworkUrl;
     if (req.url.startsWith(pantheonPrefix)) {
       target = pantheonUrl;
     }
-    else {
-    }
     proxy.web(req, res, { target })
   }).listen(bridgePort);
-
-  console.log(`Launching ${frameworkData[0].name}`);
-  const framework = spawn('npm', ['run', 'dev']);
-  addListeners(framework);
 
   // Create Express Server
   // Note: we could use node http here if we want to eliminate the Express dependency,
