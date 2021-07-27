@@ -30,19 +30,6 @@ function addListeners(child) {
   });
 }
 
-// This should override and intercept the request object. This works, but only
-// for requests to localhost. It does not capture external API requests made by
-// the /outbound path.
-function requestLogger(httpModule){
-  var original = httpModule.request
-  httpModule.request = function(options, callback){
-    console.log(options.href||options.proto+"://"+options.host+options.path, options.method)
-    return original(options, callback)
-  }
-}
-requestLogger(require('http'))
-requestLogger(require('https'))
-
 async function launchBridge() {
   console.log('=== Starting Decoupled Bridge... ===');
 
@@ -61,8 +48,6 @@ async function launchBridge() {
 
   // Proxy all traffic to desired port
   http.createServer((req, res) => {
-    // We also have access to the request here, but once again don't see external API requests
-    // console.log(req.url);
     let target = frameworkUrl;
     if (req.url.startsWith(pantheonPrefix)) {
       target = pantheonUrl;
