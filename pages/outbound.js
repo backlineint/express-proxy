@@ -1,3 +1,6 @@
+import { JsonApiLink } from "apollo-link-json-api";
+import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
+
 import addApiRouteHeader from "../utils/addApiRouteHeader";
 import cacheAwareFetch from "../utils/cacheAwareFetch";
 
@@ -9,6 +12,7 @@ function Outbound({ ...props }) {
         <li>{ props.root.links.self}</li>
         <li>{ props.articles.links.self}</li>
         <li>{ props.blocks.links.self}</li>
+        <li>{ props.title }</li>
       </ul>
     </div>
   )
@@ -57,8 +61,53 @@ export async function getServerSideProps(context) {
   // After the three API calls above, the resulting response will contain the header:
   // api-routes: https://live-contentacms.pantheonsite.io/api,https://live-contentacms.pantheonsite.io/api/articles,https://live-contentacms.pantheonsite.io/api/blocks
 
+  const jsonApiLink = new JsonApiLink({
+    uri: 'http://drupal-next.lndo.site/jsonapi/',
+  });
+
+  const client = new ApolloClient({
+    link: jsonApiLink,
+    cache: new InMemoryCache(),
+  });
+
+  const query = gql`
+    query firstarticle {
+      article @jsonapi(path: "node/article/b135b62c-a049-4c34-8db5-3941a448c1c5") {
+        title
+        body
+      }
+    }
+  `;
+
+  // Invoke the query and log the person's name
+  const title = await client.query({ query }).then(async response => {
+    return await response.data.article.title;
+  });
+
+  // const jsonApiLink = new JsonApiLink({
+  //   uri: 'http://jsonapiplayground.reyesoft.com/v2/',
+  // });
+
+  // const client = new ApolloClient({
+  //   link: jsonApiLink,
+  //   cache: new InMemoryCache(),
+  // });
+
+  // const query = gql`
+  //   query firstAuthor {
+  //     author @jsonapi(path: "authors/1") {
+  //       name
+  //     }
+  //   }
+  // `;
+
+  // // Invoke the query and log the person's name
+  // const name = await client.query({ query }).then(async response => {
+  //   return await response.data.author.name;
+  // });
+
   // Pass data to the page via props
-  return { props: { root, articles, blocks } }
+  return { props: { root, articles, blocks, title } }
 }
 
 export default Outbound 
